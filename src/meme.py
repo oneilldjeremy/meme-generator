@@ -1,7 +1,9 @@
 import os
 import random
+import argparse
 
-# @TODO Import your Ingestor and MemeEngine classes
+from QuoteEngine import Ingestor, QuoteModel
+from MemeGenerator import MemeEngine
 
 
 def generate_meme(path=None, body=None, author=None):
@@ -17,7 +19,7 @@ def generate_meme(path=None, body=None, author=None):
 
         img = random.choice(imgs)
     else:
-        img = path[0]
+        img = path
 
     if body is None:
         quote_files = ['./_data/DogQuotes/DogQuotesTXT.txt',
@@ -32,7 +34,7 @@ def generate_meme(path=None, body=None, author=None):
     else:
         if author is None:
             raise Exception('Author Required if Body is Used')
-        quote = QuoteModel(body, author)
+        quote = QuoteModel.QuoteModel(body, author)
 
     meme = MemeEngine('./tmp')
     path = meme.make_meme(img, quote.body, quote.author)
@@ -40,9 +42,24 @@ def generate_meme(path=None, body=None, author=None):
 
 
 if __name__ == "__main__":
-    # @TODO Use ArgumentParser to parse the following CLI arguments
-    # path - path to an image file
-    # body - quote body to add to the image
-    # author - quote author to add to the image
-    args = None
-    print(generate_meme(args.path, args.body, args.author))
+    parser = argparse.ArgumentParser(description="Create a meme by overlaying \
+                                                  a quotation on to an image.")
+    parser.add_argument('--path', type=str, help="The path to the image on \
+                                                  your local computer. This \
+                                                  path should be either \
+                                                  absolute, or relative to \
+                                                  the meme.py file. If left \
+                                                  blank, a random one will \
+                                                  be used.")
+    parser.add_argument('--body', type=str, help="The body of the quotation.")
+    parser.add_argument('--author', type=str, help="The author of the \
+                                                    quotation")
+
+    args = parser.parse_args()
+
+    if (args.path is not None):
+        path = os.path.normpath(args.path)
+    else:
+        path = None
+
+    print(generate_meme(path, args.body, args.author))
